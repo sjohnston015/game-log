@@ -1,20 +1,21 @@
-package com.johnstondev.gamelog;
+package com.johnstondev.gamelog.repository;
 
 import com.johnstondev.gamelog.model.User;
-import com.johnstondev.gamelog.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@ActiveProfiles("test") // please work...
 public class UserRepositoryTests {
 
     @Autowired
@@ -27,18 +28,17 @@ public class UserRepositoryTests {
     public void saveAndFindUser() {
 
         // create user, then save user
-        User user = new User(1L, "user", "test@email.com");
+        User user = new User(null, "user", "test@email.com");
         User saved = userRepository.save(user);
 
         // check if user was saved
-        assertEquals(1L, saved.getId());
-        assertEquals("user", saved.getUsername());
-        assertEquals("test@email.com", saved.getEmail());
+        assertThat(saved.getId()).isNotNull(); // ID should be made automatically
+        assertThat(saved.getUsername()).isEqualTo("user");
+        assertThat(saved.getEmail()).isEqualTo("test@email.com");
 
-        // check if user was actually saved and can be found
+        // check if user can be found
         Optional<User> found = userRepository.findById(saved.getId());
-        assertTrue(found.isPresent());
-        assertEquals("user", found.get().getUsername());
+        assertThat(found).isPresent();
+        assertThat(found.get().getUsername()).isEqualTo("user");
     }
-
 }
