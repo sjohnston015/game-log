@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
+@ActiveProfiles("test")
 public class UserRepositoryTests {
 
     @Autowired
@@ -40,5 +42,13 @@ public class UserRepositoryTests {
         Optional<User> found = userRepository.findById(saved.getId());
         assertThat(found).isPresent();
         assertThat(found.get().getUsername()).isEqualTo("user");
+    }
+
+    @Test
+    public void shouldReturnEmptyWhenUserNotFound() {
+
+        // should return empty for a user that does not exist
+        Optional<User> found = userRepository.findById(999L);
+        assertThat(found).isEmpty();
     }
 }
