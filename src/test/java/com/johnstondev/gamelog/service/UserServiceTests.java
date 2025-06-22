@@ -3,17 +3,18 @@ package com.johnstondev.gamelog.service;
 import com.johnstondev.gamelog.model.User;
 import com.johnstondev.gamelog.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTests {
 
     @Mock
@@ -36,7 +37,7 @@ public class UserServiceTests {
         when(userRepository.save(any(User.class))).thenReturn(saved);
 
         // UserService method that doesn't exist yet
-        User result = userService.createUser("user", "user@email.com", "password123");
+        User result = userService.createUser(1L, "user", "user@email.com");
 
         // should be saved and should exist
         assertThat(result).isNotNull();
@@ -60,10 +61,8 @@ public class UserServiceTests {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // When
         Optional<User> result = userService.findUserById(userId);
 
-        // Then
         assertThat(result).isPresent();
         assertThat(result.get().getId()).isEqualTo(userId);
         assertThat(result.get().getUsername()).isEqualTo("user");
