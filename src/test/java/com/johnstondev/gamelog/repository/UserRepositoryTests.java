@@ -58,7 +58,7 @@ public class UserRepositoryTests {
         // set all user fields
         LocalDateTime now = LocalDateTime.now();
         User user = new User();
-        user.setUsername("testuser");
+        user.setUsername("user");
         user.setEmail("test@example.com");
         user.setPasswordHash("hashedPassword123");
         user.setCreatedAt(now);
@@ -69,7 +69,7 @@ public class UserRepositoryTests {
 
         // verify they saved properly
         assertThat(saved.getId()).isNotNull();
-        assertThat(saved.getUsername()).isEqualTo("testuser");
+        assertThat(saved.getUsername()).isEqualTo("user");
         assertThat(saved.getEmail()).isEqualTo("test@example.com");
         assertThat(saved.getPasswordHash()).isEqualTo("hashedPassword123");
         assertThat(saved.getCreatedAt()).isEqualTo(now);
