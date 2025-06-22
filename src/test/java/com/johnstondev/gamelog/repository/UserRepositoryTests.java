@@ -55,14 +55,11 @@ public class UserRepositoryTests {
     @Test
     public void saveAllUserFields() {
 
-        // set all user fields
-        LocalDateTime now = LocalDateTime.now();
+        // set all user fields, @PrePersist annotation (in User class) for timestamps
         User user = new User();
         user.setUsername("user");
         user.setEmail("user@email.com");
         user.setPasswordHash("hashedPassword123");
-        user.setCreatedAt(now);
-        user.setUpdatedAt(now);
 
         // save that
         User saved = userRepository.save(user);
@@ -72,8 +69,8 @@ public class UserRepositoryTests {
         assertThat(saved.getUsername()).isEqualTo("user");
         assertThat(saved.getEmail()).isEqualTo("user@email.com");
         assertThat(saved.getPasswordHash()).isEqualTo("hashedPassword123");
-        assertThat(saved.getCreatedAt()).isEqualTo(now);
-        assertThat(saved.getUpdatedAt()).isEqualTo(now);
+        assertThat(saved.getCreatedAt()).isNotNull();
+        assertThat(saved.getUpdatedAt()).isNotNull();
     }
 
     @Test
@@ -86,6 +83,7 @@ public class UserRepositoryTests {
         user.setPasswordHash("password123");
 
         User saved = userRepository.save(user);
+        LocalDateTime save = LocalDateTime.now();
 
         // timestamps should be set automatically...
         assertThat(saved.getCreatedAt()).isNotNull();
@@ -93,8 +91,7 @@ public class UserRepositoryTests {
         assertThat(saved.getCreatedAt()).isEqualTo(saved.getUpdatedAt());
 
         // they should be recent as well
-        LocalDateTime now = LocalDateTime.now();
-        assertThat(saved.getCreatedAt()).isBefore(now.plusSeconds(1));
-        assertThat(saved.getCreatedAt()).isAfter(now.minusSeconds(5));
+        assertThat(saved.getCreatedAt()).isBefore(save.plusSeconds(1));
+        assertThat(saved.getCreatedAt()).isAfter(save.minusSeconds(5));
     }
 }
