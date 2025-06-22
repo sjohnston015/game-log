@@ -25,7 +25,7 @@ public class UserRepositoryTests {
 
         // create user, then save user
         LocalDateTime now = LocalDateTime.now();
-        User user = new User(null, "user", "test@email.com");
+        User user = new User(null, "user", "user@email.com");
         user.setPasswordHash("testPassword123");
         user.setCreatedAt(now);
         user.setUpdatedAt(now);
@@ -35,7 +35,7 @@ public class UserRepositoryTests {
         // check if user was saved
         assertThat(saved.getId()).isNotNull(); // ID should be made automatically
         assertThat(saved.getUsername()).isEqualTo("user");
-        assertThat(saved.getEmail()).isEqualTo("test@email.com");
+        assertThat(saved.getEmail()).isEqualTo("user@email.com");
         assertThat(saved.getPasswordHash()).isEqualTo("testPassword123");
 
         // check if user can be found
@@ -59,7 +59,7 @@ public class UserRepositoryTests {
         LocalDateTime now = LocalDateTime.now();
         User user = new User();
         user.setUsername("user");
-        user.setEmail("test@example.com");
+        user.setEmail("user@email.com");
         user.setPasswordHash("hashedPassword123");
         user.setCreatedAt(now);
         user.setUpdatedAt(now);
@@ -70,9 +70,31 @@ public class UserRepositoryTests {
         // verify they saved properly
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getUsername()).isEqualTo("user");
-        assertThat(saved.getEmail()).isEqualTo("test@example.com");
+        assertThat(saved.getEmail()).isEqualTo("user@email.com");
         assertThat(saved.getPasswordHash()).isEqualTo("hashedPassword123");
         assertThat(saved.getCreatedAt()).isEqualTo(now);
         assertThat(saved.getUpdatedAt()).isEqualTo(now);
+    }
+
+    @Test
+    public void shouldSetTimestampsAutomatically() {
+
+        // not setting createdAt or updatedAt fields
+        User user = new User();
+        user.setUsername("user");
+        user.setEmail("user@email.com");
+        user.setPasswordHash("password123");
+
+        User saved = userRepository.save(user);
+
+        // timestamps should be set automatically...
+        assertThat(saved.getCreatedAt()).isNotNull();
+        assertThat(saved.getUpdatedAt()).isNotNull();
+        assertThat(saved.getCreatedAt()).isEqualTo(saved.getUpdatedAt());
+
+        // they should be recent as well
+        LocalDateTime now = LocalDateTime.now();
+        assertThat(saved.getCreatedAt()).isBefore(now.plusSeconds(1));
+        assertThat(saved.getCreatedAt()).isAfter(now.minusSeconds(5));
     }
 }
