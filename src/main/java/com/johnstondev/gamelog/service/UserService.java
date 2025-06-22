@@ -18,7 +18,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(String username, String email, String passwordHash) {
+    public User createUser(String username, String email, String password) {
+        String passwordHash = password + "-hashed";
         User createdUser = new User(null, username, email, passwordHash);
         return userRepository.save(createdUser);
     }

@@ -44,7 +44,7 @@ public class UserServiceTests {
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getUsername()).isEqualTo("user");
         assertThat(result.getEmail()).isEqualTo("user@email.com");
-        assertThat(result.getPasswordHash()).isNotEqualTo("password123"); // Should be hashed
+        assertThat(result.getPasswordHash()).isNotEqualTo("password123");
 
         // verify repo was called
         verify(userRepository, times(1)).save(any(User.class));
