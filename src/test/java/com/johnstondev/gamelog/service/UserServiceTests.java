@@ -37,7 +37,7 @@ public class UserServiceTests {
         when(userRepository.save(any(User.class))).thenReturn(saved);
 
         // UserService method that doesn't exist yet
-        User result = userService.createUser(1L, "user", "user@email.com");
+        User result = userService.createUser("user", "user@email.com", "hashedPassword123");
 
         // should be saved and should exist
         assertThat(result).isNotNull();

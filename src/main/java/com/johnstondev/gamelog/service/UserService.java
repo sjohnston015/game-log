@@ -16,10 +16,9 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(Long id, String username, String email) {
-        User createdUser = new User(id, username, email);
-        userRepository.save(createdUser);
-        return createdUser;
+    public User createUser(String username, String email, String passwordHash) {
+        User createdUser = new User(null, username, email, passwordHash);
+        return userRepository.save(createdUser);
     }
 
     public Optional<User> findUserById(Long id) {

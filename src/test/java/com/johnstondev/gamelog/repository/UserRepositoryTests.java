@@ -25,7 +25,9 @@ public class UserRepositoryTests {
 
         // create user, then save user
         LocalDateTime now = LocalDateTime.now();
-        User user = new User(null, "user", "user@email.com");
+        User user = new User();
+        user.setUsername("user");
+        user.setEmail("user@email.com");
         user.setPasswordHash("testPassword123");
         user.setCreatedAt(now);
         user.setUpdatedAt(now);

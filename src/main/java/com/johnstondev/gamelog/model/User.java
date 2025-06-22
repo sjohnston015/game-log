@@ -36,10 +36,11 @@ public class User {
     public User() {}
 
     // Constructor with basic fields
-    public User(Long id, String username, String email) {
+    public User(Long id, String username, String email, String passwordHash) {
         this.id = id;
         this.username = username;
         this.email = email;
+        this.passwordHash = passwordHash;
     }
 
     // All getters and setters ＼(￣▽￣)／
