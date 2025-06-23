@@ -25,11 +25,6 @@ public class UserService {
     }
 
     public Optional<User> findUserById(Long id) {
-
-        if (userRepository.existsById(id)) {
-            return userRepository.findById(id);
-        }
-
-        throw new IllegalArgumentException("User with id: " + id + " does not exist");
+        return userRepository.findById(id);
     }
 }

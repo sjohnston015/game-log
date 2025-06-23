@@ -40,8 +40,26 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // return a UserResponseDTO to not expose any fields that must be private (password)
     @GetMapping("/{id}")
-    public Optional<User> findUserById(@PathVariable Long id) {
-        return userService.findUserById(id);
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
+
+        Optional<User> user = userService.findUserById(id);
+
+        // check that if for the given id, there exists a user
+        if (user.isPresent()) {
+            UserResponseDTO responseDTO = new UserResponseDTO(
+                    user.get().getId(),
+                    user.get().getUsername(),
+                    user.get().getEmail(),
+                    user.get().getCreatedAt()
+            );
+
+            // return the responseDTO
+            return ResponseEntity.ok(responseDTO);
+
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
