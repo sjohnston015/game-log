@@ -1,8 +1,19 @@
 package com.johnstondev.gamelog.dto;
 
+import jakarta.validation.constraints.*;
+
 public class CreateUserRequestDTO {
+
+    @NotBlank(message = "A username is required.")
+    @Size(min = 3, max = 25, message = "A username must be between 3 and 25 characters.")
     private String username;
+
+    @NotBlank(message = "An email is required.")
+    @Email(message = "Email must be valid.")
     private String email;
+
+    @NotBlank(message = "A password is required.")
+    @Size(min = 12, message = "A password must be AT LEAST 12 characters long.")
     private String password;
 
     // default constructor for JSON

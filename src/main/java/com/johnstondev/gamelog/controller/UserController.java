@@ -4,6 +4,7 @@ import com.johnstondev.gamelog.dto.CreateUserRequestDTO;
 import com.johnstondev.gamelog.dto.UserResponseDTO;
 import com.johnstondev.gamelog.model.User;
 import com.johnstondev.gamelog.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody CreateUserRequestDTO request) {
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody CreateUserRequestDTO request) {
         User createdUser = userService.createUser(
                 request.getUsername(),
                 request.getEmail(),

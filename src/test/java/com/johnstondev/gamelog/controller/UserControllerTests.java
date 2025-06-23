@@ -88,4 +88,52 @@ public class UserControllerTests {
         mockMvc.perform(get("/api/users/999"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void should400WhenUsernameIsBlank() throws Exception {
+        String requestBody = """
+            {
+                "username": "",
+                "email": "test@email.com",
+                "password": "password123"
+            }
+            """;
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void should400WhenEmailIsInvalid() throws Exception {
+        String requestBody = """
+            {
+                "username": "user",
+                "email": "invalid-email",
+                "password": "password123"
+            }
+            """;
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void should400WhenPasswordIsTooShort() throws Exception {
+        String requestBody = """
+            {
+                "username": "user",
+                "email": "user@email.com",
+                "password": "short"
+            }
+            """;
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
 }
