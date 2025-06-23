@@ -38,7 +38,7 @@ public class UserControllerTests {
         user.setEmail("user@email.com");
         user.setPasswordHash("password123_hashed");
 
-        when(userService.createUser("user", "user@email.com", "password123"))
+        when(userService.createUser("user", "user@email.com", "password1234"))
                 .thenReturn(user);
 
         // create JSON request
@@ -46,7 +46,7 @@ public class UserControllerTests {
                 {
                     "username": "user",
                     "email": "user@email.com",
-                    "password": "password123"
+                    "password": "password1234"
                 }
                 """;
 
@@ -55,7 +55,7 @@ public class UserControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.username").value("user"))
                 .andExpect(jsonPath("$.email").value("user@email.com"))
                 .andExpect(jsonPath("$.passwordHash").doesNotExist()); // shouldn't expose password hash
