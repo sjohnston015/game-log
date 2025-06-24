@@ -1,6 +1,7 @@
 package com.johnstondev.gamelog.controller;
 
 import com.johnstondev.gamelog.dto.CreateUserRequestDTO;
+import com.johnstondev.gamelog.dto.UpdateUserRequestDTO;
 import com.johnstondev.gamelog.dto.UserResponseDTO;
 import com.johnstondev.gamelog.model.User;
 import com.johnstondev.gamelog.service.UserService;
@@ -15,6 +16,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
+    // POST -> Create // GET -> Read // PUT -> Update // DELETE -> Delete
 
     private final UserService userService;
 
@@ -62,5 +65,28 @@ public class UserController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // update user fields, such as a user's username or email address
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequestDTO request) {
+
+        // update user fields with parameters aka the updates we want to happen
+        User updatedUser = userService.updateUser(id, request.getUsername(), request.getEmail());
+
+        // make a responseDTO with new fields
+        UserResponseDTO response = new UserResponseDTO(
+                updatedUser.getId(),
+                updatedUser.getUsername(),
+                updatedUser.getEmail(),
+                updatedUser.getCreatedAt()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser() {
+        return null;
     }
 }
