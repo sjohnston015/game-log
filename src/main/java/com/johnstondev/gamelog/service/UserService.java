@@ -18,6 +18,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    // TODO: Implement better password hashing LOL
     public User createUser(String username, String email, String password) {
         String passwordHash = password + "-hashed";
         User createdUser = new User(null, username, email, passwordHash);
@@ -29,10 +30,9 @@ public class UserService {
     }
 
     // TODO: Allow users to update their password, safely and securely
-
     public User updateUser(Long id, String username, String email) {
 
-        // find user; throw RuntimeException if a user is not found with given id
+        // find user; throw RuntimeException if a User is not found with given id
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
             throw new RuntimeException("User no found with id: " + id);
@@ -41,6 +41,7 @@ public class UserService {
         // update username/email fields
         User user = userOptional.get();
 
+        // verify parameters are valid and update corresponding fields
         if ((username != null && !username.trim().isEmpty())) {
             user.setUsername(username);
         }
