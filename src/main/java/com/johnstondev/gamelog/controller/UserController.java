@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -85,8 +86,16 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // delete a user entirely from the database
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser() {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // get all users -> PLANNING to use pageables later
+    @GetMapping
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return null;
     }
 }

@@ -5,6 +5,7 @@ import com.johnstondev.gamelog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,5 +52,21 @@ public class UserService {
         }
 
         return userRepository.save(user);
+    }
+
+    // deleting a User by their ID (removing from database)
+    public void deleteUser(Long id) {
+
+        // verify a User with given ID exists and can be deleted, throw exception if not
+        if (!(userRepository.existsById(id))) {
+            throw new RuntimeException("User does not exist with id: " + id);
+        }
+
+        userRepository.deleteById(id);
+    }
+
+    // return all Users
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }
