@@ -28,6 +28,8 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    // TODO: Allow users to update their password, safely and securely
+
     public User updateUser(Long id, String username, String email) {
 
         // find user; throw RuntimeException if a user is not found with given id
@@ -37,9 +39,6 @@ public class UserService {
         }
 
         // update username/email fields
-        // TODO: Allow users to update their password, safely and securely
-        // password updates will be handled differently for security
-
         User user = userOptional.get();
 
         if ((username != null && !username.trim().isEmpty())) {
