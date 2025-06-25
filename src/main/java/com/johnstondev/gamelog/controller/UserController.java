@@ -90,7 +90,13 @@ public class UserController {
     // delete a user entirely from the database
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+        // try-catch block for
+        try {
+
+        } catch (RuntimeException e) {
+            userService.deleteUser(id);
+        }
+
         return ResponseEntity.noContent().build();
     }
 
