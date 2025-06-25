@@ -59,6 +59,7 @@ public class UserService {
 
         // verify a User with given ID exists and can be deleted, throw exception if not
         if (!(userRepository.existsById(id))) {
+            // will throw a more informative error later, placeholder for now
             throw new RuntimeException("User does not exist with id: " + id);
         }
 
