@@ -277,7 +277,6 @@ public class UserControllerTests {
         verify(userService, times(1)).deleteUser(id);
     }
 
-    // failing all delete controller tests
     @Test
     public void handleDatabaseErrorDuringDelete() throws Exception {
         Long id = 1L;

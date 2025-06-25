@@ -70,34 +70,38 @@ public class UserController {
     }
 
     // update user fields, such as a user's username or email address
+    // need to move away from the try-catch blocks and figure out a better way for error-handling
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequestDTO request) {
+        try {
+            // update user fields with the parameters aka the updates we want to happen
+            User updatedUser = userService.updateUser(id, request.getUsername(), request.getEmail());
 
-        // update user fields with parameters aka the updates we want to happen
-        User updatedUser = userService.updateUser(id, request.getUsername(), request.getEmail());
+            UserResponseDTO response = new UserResponseDTO(
+                    updatedUser.getId(),
+                    updatedUser.getUsername(),
+                    updatedUser.getEmail(),
+                    updatedUser.getCreatedAt()
+            );
 
-        // make a responseDTO with new fields
-        UserResponseDTO response = new UserResponseDTO(
-                updatedUser.getId(),
-                updatedUser.getUsername(),
-                updatedUser.getEmail(),
-                updatedUser.getCreatedAt()
-        );
-
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // delete a user entirely from the database
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        // try-catch block for
+        // try-catch block for exception-handling in UserController
         try {
-
-        } catch (RuntimeException e) {
             userService.deleteUser(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        return ResponseEntity.noContent().build();
     }
 
     // get all users -> PLANNING to use pageables later
