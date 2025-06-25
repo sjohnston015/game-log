@@ -13,7 +13,6 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    // constructor injection
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;

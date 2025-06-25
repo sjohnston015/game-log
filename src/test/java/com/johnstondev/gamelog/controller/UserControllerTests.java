@@ -7,10 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
 
@@ -27,7 +30,7 @@ public class UserControllerTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
     @Test
@@ -302,5 +305,51 @@ public class UserControllerTests {
             verify(userService, times(1)).deleteUser(id);
             reset(userService);
         }
+    }
+
+    @Test
+    public void getAllUsers() throws Exception {
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("user1");
+        user1.setEmail("user1@email.com");
+        user1.setCreatedAt(LocalDateTime.now());
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("user2");
+        user2.setEmail("user2@email.com");
+        user2.setCreatedAt(LocalDateTime.now());
+
+        List<User> users = Arrays.asList(user1, user2);
+        when(userService.getAllUsers()).thenReturn(users);
+
+        mockMvc.perform(get("/api/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].username").value("user1"))
+                .andExpect(jsonPath("$[0].email").value("user1@email.com"))
+                .andExpect(jsonPath("$[0].passwordHash").doesNotExist())
+                .andExpect(jsonPath("$[1].id").value(2))
+                .andExpect(jsonPath("$[1].username").value("user2"))
+                .andExpect(jsonPath("$[1].email").value("user2@email.com"));
+
+        verify(userService, times(1)).getAllUsers();
+    }
+
+    @Test
+    public void getAllUsersWhenEmpty() throws Exception {
+        List<User> emptyList = new ArrayList<>();
+        when(userService.getAllUsers()).thenReturn(emptyList);
+
+        // act & assert
+        mockMvc.perform(get("/api/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
+
+        verify(userService, times(1)).getAllUsers();
     }
 }

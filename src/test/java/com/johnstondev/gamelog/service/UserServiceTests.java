@@ -8,6 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
 
@@ -216,5 +219,45 @@ public class UserServiceTests {
 
         verify(userRepository, times(1)).existsById(id);
         verify(userRepository, times(1)).deleteById(id);
+    }
+
+    @Test
+    public void getAllUsers() {
+        // create a list of users to "get"
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("user1");
+        user1.setEmail("user1@email.com");
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("user2");
+        user2.setEmail("user2@email.com");
+
+        List<User> users = Arrays.asList(user1, user2);
+        when(userRepository.findAll()).thenReturn(users);
+
+        // get the users
+        List<User> result = userService.getAllUsers();
+
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getUsername()).isEqualTo("user1");
+        assertThat(result.get(1).getUsername()).isEqualTo("user2");
+
+        verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void getAllUsersWhenEmpty() {
+        List<User> emptyList = new ArrayList<>();
+        when(userRepository.findAll()).thenReturn(emptyList);
+
+        List<User> result = userService.getAllUsers();
+
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(0);
+
+        verify(userRepository, times(1)).findAll();
     }
 }
