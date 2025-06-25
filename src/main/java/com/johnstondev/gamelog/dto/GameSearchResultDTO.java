@@ -2,6 +2,8 @@ package com.johnstondev.gamelog.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public class GameSearchResultDTO {
 
     private Long id;
@@ -10,7 +12,10 @@ public class GameSearchResultDTO {
 
     @JsonProperty("background_image")
     private String backgroundImage;
-    private String[] platforms;
+
+    @JsonProperty("platforms")
+    private List<PlatformInfo> platforms;
+
     private String released;
     private Double rating;
 
@@ -18,21 +23,27 @@ public class GameSearchResultDTO {
     private Integer ratingsCount;
     private Integer metacritic;
 
-    public GameSearchResultDTO() {} // default constructor for DTO
+    // inner class to get the "platforms" from the JSON response from RAWG
+    public static class PlatformInfo {
+        private PlatformDetail platform;
 
-    public GameSearchResultDTO(Long id, String name, String slug, String backgroundImage,
-                               String[] platforms, String released, Double rating, Integer ratingsCount,
-                               Integer metacritic) {
-        this.id = id;
-        this.name = name;
-        this.slug = slug;
-        this.backgroundImage = backgroundImage;
-        this.platforms = platforms;
-        this.released = released;
-        this.rating = rating;
-        this.ratingsCount = ratingsCount;
-        this.metacritic = metacritic;
+        public static class PlatformDetail {
+            private String name;
+
+            public PlatformDetail() {}
+
+            public String getName() { return name; }
+            public void setName(String name) { this.name = name; }
+        }
+
+        public PlatformInfo() {}
+
+        public PlatformDetail getPlatform() { return platform; }
+        public void setPlatform(PlatformDetail platform) { this.platform = platform; }
     }
+
+    // default constructor for DTO
+    public GameSearchResultDTO() {}
 
     // getters and setters !!!!! ┐(︶▽︶)┌
 
@@ -48,8 +59,8 @@ public class GameSearchResultDTO {
     public String getBackgroundImage() { return backgroundImage; }
     public void setBackgroundImage(String backgroundImage) { this.backgroundImage = backgroundImage; }
 
-    public String[] getPlatforms() { return platforms; }
-    public void setPlatforms(String[] platforms) { this.platforms = platforms; }
+    public List<PlatformInfo> getPlatforms() { return platforms; }
+    public void setPlatforms(List<PlatformInfo> platforms) { this.platforms = platforms; }
 
     public String getReleased() { return released; }
     public void setReleased(String released) { this.released = released; }

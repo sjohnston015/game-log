@@ -22,6 +22,11 @@ public class GameController {
         this.rawgService = rawgService;
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Controller is working!");
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<GameSearchResultDTO>> searchGames(@RequestParam String q) {
         try {

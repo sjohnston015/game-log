@@ -63,7 +63,6 @@ public class UserController {
 
             // return the responseDTO
             return ResponseEntity.ok(responseDTO);
-
         } else {
             return ResponseEntity.notFound().build();
         }
