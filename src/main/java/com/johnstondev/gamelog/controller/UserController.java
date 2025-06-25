@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,6 +97,20 @@ public class UserController {
     // get all users -> PLANNING to use pageables later
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        return null;
+        List<User> allUsers = userService.getAllUsers();
+        List<UserResponseDTO> allUsersDTO = new ArrayList<>();
+
+        for (User user : allUsers) {
+            UserResponseDTO responseDTO = new UserResponseDTO(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getCreatedAt()
+            );
+
+            allUsersDTO.add(responseDTO);
+        }
+
+        return ResponseEntity.ok(allUsersDTO);
     }
 }
