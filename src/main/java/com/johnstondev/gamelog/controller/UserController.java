@@ -71,7 +71,8 @@ public class UserController {
     // update user fields, such as a user's username or email address
     // need to move away from the try-catch blocks and figure out a better way for error-handling
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequestDTO request) {
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id,
+                                                      @Valid @RequestBody UpdateUserRequestDTO request) {
         try {
             // update user fields with the parameters aka the updates we want to happen
             User updatedUser = userService.updateUser(id, request.getUsername(), request.getEmail());
