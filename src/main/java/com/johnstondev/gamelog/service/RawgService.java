@@ -74,7 +74,7 @@ public class RawgService {
     }
 
     // get detailed info about one specific game
-    public GameDetailDTO getGameDetails(Long rawgGameId) {
+    public GameDetailDTO getGameDetails(Long rawgId) {
         return null;
     }
 

@@ -28,6 +28,7 @@ public class GameLogEntryService {
 
     // add a specific game to a specific user's library
     public GameLogEntryResponseDTO addGameToGameLog(Long userId, AddGameRequestDTO request) {
+
         // verify user exists
         // call RAWG API to get game details
         // create new GameLogEntry with user data and RAWG data
@@ -66,8 +67,12 @@ public class GameLogEntryService {
 
     // ----- helper methods -----
 
+    // check if user exists, throw exception if not
     private void validateUserExists(Long userId) {
-        // check if user exists, throw exception if not
+        if (!userRepository.existsById(userId)) {
+            // runtime exception thrown for now
+            throw new RuntimeException("User not found with id: " + userId);
+        }
     }
 
     // convert GameLogEntry entity to DTO
