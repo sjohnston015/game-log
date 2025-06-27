@@ -33,13 +33,15 @@ public class GameLogEntryService {
 
         // verify user exists in db and get make RAWG call to get game details (as DTO)
         verifyUserExists(userId);
+        User user = userRepository.findById(userId).get();
         GameDetailDTO gameDetails = rawgService.getGameDetails(request.getRawgId());
-        return null;
 
+        // make new GameLogEntry (GLE) with user and RAWG data; then save to db
+        GameLogEntry entry = createNewEntry(user, request, gameDetails);
+        gameLogRepository.save(entry);
 
-        // create new GameLogEntry with user data and RAWG data
-        // save to db
-        // convert to response DTO and return
+        // convert to and then return response DTO
+        return convertToResponseDTO(entry);
     }
 
     public List<GameLogEntryResponseDTO> getUserLibrary(Long userId) {
@@ -79,7 +81,7 @@ public class GameLogEntryService {
         }
     }
 
-    // helps create a GameLogEntry (GLE) without having to do it over and over
+    // helps create a GLE without having to do it over and over
     private GameLogEntry createNewEntry(User user, AddGameRequestDTO request, GameDetailDTO gameDetails) {
         GameLogEntry entry = new GameLogEntry();
         entry.setUser(user);
