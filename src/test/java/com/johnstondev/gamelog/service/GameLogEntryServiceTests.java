@@ -38,7 +38,7 @@ public class GameLogEntryServiceTests {
     private GameLogEntryService gameLogEntryService;
 
     @Test
-    public void addGameToGameLog_ValidRequest_SuccessfullyAddsGame() {
+    public void addGameToLogSuccess() {
 
         Long userId = 1L;
         Long rawgId = 12345L;
@@ -72,7 +72,7 @@ public class GameLogEntryServiceTests {
         savedEntry.setUpdatedAt(LocalDateTime.now());
 
         // --- config. mock behavior ---
-
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(rawgService.getGameDetails(rawgId)).thenReturn(gameDetails);
         when(gameLogRepository.save(any(GameLogEntry.class))).thenReturn(savedEntry);
@@ -93,22 +93,21 @@ public class GameLogEntryServiceTests {
     }
 
     @Test
-    public void addGameToGameLog_UserNotFound_ThrowsException() {
+    public void addGameToLogUserNotFound() {
 
-        Long nonExistentUserId = 999L;
+        Long fakeUserId = 999L;
         AddGameRequestDTO request = new AddGameRequestDTO(12345L, GameStatus.PLANNING, 8);
 
         // config. mock to return empty (user not found)
-        when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
+        when(userRepository.existsById(fakeUserId)).thenReturn(false); // I cannot believe this
 
         // assertThrows() verifies that the method throws the expected exception
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            gameLogEntryService.addGameToLog(nonExistentUserId, request);
+            gameLogEntryService.addGameToLog(fakeUserId, request);
         });
 
         // verify the exception message contains helpful information
         assertThat(exception.getMessage()).contains("User not found");
-
         verify(rawgService, never()).getGameDetails(any());
         verify(gameLogRepository, never()).save(any());
     }

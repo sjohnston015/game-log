@@ -38,10 +38,10 @@ public class GameLogEntryService {
 
         // make new GameLogEntry (GLE) with user and RAWG data; then save to db
         GameLogEntry entry = createNewEntry(user, request, gameDetails);
-        gameLogRepository.save(entry);
+        GameLogEntry saved = gameLogRepository.save(entry); // b/c this generates the ID in the database
 
         // convert to and then return response DTO
-        return convertToResponseDTO(entry);
+        return convertToResponseDTO(saved);
     }
 
     public List<GameLogEntryResponseDTO> getUserLibrary(Long userId) {
