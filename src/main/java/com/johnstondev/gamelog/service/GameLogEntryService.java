@@ -67,7 +67,6 @@ public class GameLogEntryService {
 
     // ----- helper methods -----
 
-    // check if user exists, throw exception if not
     private void validateUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {
             // runtime exception thrown for now
