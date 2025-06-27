@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -110,5 +112,84 @@ public class GameLogEntryServiceTests {
         assertThat(exception.getMessage()).contains("User not found");
         verify(rawgService, never()).getGameDetails(any());
         verify(gameLogRepository, never()).save(any());
+    }
+
+    @Test
+    public void getUserGameLog() {
+
+        Long userId = 1L;
+        User mockUser = new User();
+        mockUser.setId(userId);
+        mockUser.setUsername("user");
+        mockUser.setEmail("user@email.com");
+
+        // create multiple game log entries for this user
+        GameLogEntry entry1 = new GameLogEntry();
+        entry1.setId(1L);
+        entry1.setUser(mockUser);
+        entry1.setRawgId(111L);
+        entry1.setGameTitle("Zelda: Breath of the Wild");
+        entry1.setGameCoverImage("https://media.rawg.io/media/games/zelda.jpg");
+        entry1.setStatus(GameStatus.COMPLETED);
+        entry1.setRating(10);
+        entry1.setAddedAt(LocalDateTime.now().minusDays(5));
+        entry1.setUpdatedAt(LocalDateTime.now().minusDays(1));
+
+        GameLogEntry entry2 = new GameLogEntry();
+        entry2.setId(2L);
+        entry2.setUser(mockUser);
+        entry2.setRawgId(222L);
+        entry2.setGameTitle("Elden Ring");
+        entry2.setGameCoverImage("https://media.rawg.io/media/games/elden.jpg");
+        entry2.setStatus(GameStatus.PLAYING);
+        entry2.setRating(null); // No rating yet
+        entry2.setAddedAt(LocalDateTime.now().minusDays(2));
+        entry2.setUpdatedAt(LocalDateTime.now());
+
+        List<GameLogEntry> userGameEntries = Arrays.asList(entry1, entry2);
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(gameLogRepository.findByUserId(userId)).thenReturn(userGameEntries);
+
+        List<GameLogEntryResponseDTO> result = gameLogEntryService.getUserGameLog(userId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(2);
+
+        // check first game
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        assertThat(result.get(0).getRawgGameId()).isEqualTo(111L);
+        assertThat(result.get(0).getGameTitle()).isEqualTo("Zelda: Breath of the Wild");
+        assertThat(result.get(0).getStatus()).isEqualTo(GameStatus.COMPLETED);
+        assertThat(result.get(0).getRating()).isEqualTo(10);
+
+        // check second game
+        assertThat(result.get(1).getId()).isEqualTo(2L);
+        assertThat(result.get(1).getRawgGameId()).isEqualTo(222L);
+        assertThat(result.get(1).getGameTitle()).isEqualTo("Elden Ring");
+        assertThat(result.get(1).getStatus()).isEqualTo(GameStatus.PLAYING);
+        assertThat(result.get(1).getRating()).isNull(); // No rating
+
+        verify(userRepository, times(1)).existsById(userId);
+        verify(gameLogRepository, times(1)).findByUserId(userId);
+    }
+
+    @Test
+    public void getUserGameLogUserNotFound() {
+
+        Long nonExistentUserId = 999L;
+
+        // config. mock to return false (user doesn't exist)
+        when(userRepository.existsById(nonExistentUserId)).thenReturn(false);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            gameLogEntryService.getUserGameLog(nonExistentUserId);
+        });
+
+        // verify exception message
+        assertThat(exception.getMessage()).contains("User not found with id: " + nonExistentUserId);
+
+        // security check --- should NOT query for games if user doesn't exist
+        verify(gameLogRepository, never()).findByUserId(any());
     }
 }

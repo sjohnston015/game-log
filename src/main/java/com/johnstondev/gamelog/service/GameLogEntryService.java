@@ -44,7 +44,7 @@ public class GameLogEntryService {
         return convertToResponseDTO(saved);
     }
 
-    public List<GameLogEntryResponseDTO> getUserLibrary(Long userId) {
+    public List<GameLogEntryResponseDTO> getUserGameLog(Long userId) {
         // verify user is real
         // get all entries for that user
         // convert each entry to DTO
