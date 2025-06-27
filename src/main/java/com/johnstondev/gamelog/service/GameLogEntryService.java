@@ -11,6 +11,7 @@ import com.johnstondev.gamelog.repository.GameLogEntryRepository;
 import com.johnstondev.gamelog.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,11 +46,17 @@ public class GameLogEntryService {
     }
 
     public List<GameLogEntryResponseDTO> getUserGameLog(Long userId) {
-        // verify user is real
-        // get all entries for that user
-        // convert each entry to DTO
-        // return list of DTOs
-        return null;
+
+        // verify user and get entries for them
+        verifyUserExists(userId);
+        List<GameLogEntry> entries = gameLogRepository.findByUserId(userId);
+        List<GameLogEntryResponseDTO> userGameLog = new ArrayList<>();
+
+        // convert each entry to response DTO and add to return list
+        // I learned about streams -- really cool because I'm familiar with function languages like Ocaml
+        return entries.stream()
+                .map(this::convertToResponseDTO)
+                .toList();
     }
 
     public List<GameLogEntryResponseDTO> getUserLibraryByStatus(Long userId, GameStatus status) {
