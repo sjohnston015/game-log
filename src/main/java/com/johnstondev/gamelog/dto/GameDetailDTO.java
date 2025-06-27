@@ -1,6 +1,7 @@
 package com.johnstondev.gamelog.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.johnstondev.gamelog.model.GameStatus;
 
 import java.util.List;
 

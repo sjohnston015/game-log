@@ -1,10 +1,12 @@
 package com.johnstondev.gamelog.service;
 
 import com.johnstondev.gamelog.dto.AddGameRequestDTO;
+import com.johnstondev.gamelog.dto.GameDetailDTO;
 import com.johnstondev.gamelog.dto.GameLogEntryResponseDTO;
 import com.johnstondev.gamelog.dto.UpdateGameRequestDTO;
 import com.johnstondev.gamelog.model.GameLogEntry;
 import com.johnstondev.gamelog.model.GameStatus;
+import com.johnstondev.gamelog.model.User;
 import com.johnstondev.gamelog.repository.GameLogEntryRepository;
 import com.johnstondev.gamelog.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -27,14 +29,17 @@ public class GameLogEntryService {
     }
 
     // add a specific game to a specific user's library
-    public GameLogEntryResponseDTO addGameToGameLog(Long userId, AddGameRequestDTO request) {
+    public GameLogEntryResponseDTO addGameToLog(Long userId, AddGameRequestDTO request) {
 
-        // verify user exists
-        // call RAWG API to get game details
+        // verify user exists in db and get make RAWG call to get game details (as DTO)
+        verifyUserExists(userId);
+        GameDetailDTO gameDetails = rawgService.getGameDetails(request.getRawgId());
+        return null;
+
+
         // create new GameLogEntry with user data and RAWG data
         // save to db
         // convert to response DTO and return
-        return null;
     }
 
     public List<GameLogEntryResponseDTO> getUserLibrary(Long userId) {
@@ -67,11 +72,23 @@ public class GameLogEntryService {
 
     // ----- helper methods -----
 
-    private void validateUserExists(Long userId) {
+    private void verifyUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {
             // runtime exception thrown for now
             throw new RuntimeException("User not found with id: " + userId);
         }
+    }
+
+    // helps create a GameLogEntry (GLE) without having to do it over and over
+    private GameLogEntry createNewEntry(User user, AddGameRequestDTO request, GameDetailDTO gameDetails) {
+        GameLogEntry entry = new GameLogEntry();
+        entry.setUser(user);
+        entry.setRawgId(request.getRawgId());
+        entry.setGameTitle(gameDetails.getName());
+        entry.setGameCoverImage(gameDetails.getBackgroundImage());
+        entry.setStatus(request.getStatus());
+        entry.setRating(request.getRating()); // could be null
+        return entry;
     }
 
     // convert GameLogEntry entity to DTO

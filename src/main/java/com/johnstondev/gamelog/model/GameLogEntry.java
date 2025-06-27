@@ -45,9 +45,9 @@ public class GameLogEntry {
 
     public GameLogEntry() {}
 
-    public GameLogEntry(User user, Long rawgGameId, String gameTitle, GameStatus status) {
+    public GameLogEntry(User user, Long rawgId, String gameTitle, GameStatus status) {
         this.user = user;
-        this.rawgId = rawgGameId;
+        this.rawgId = rawgId;
         this.gameTitle = gameTitle;
         this.status = status;
     }

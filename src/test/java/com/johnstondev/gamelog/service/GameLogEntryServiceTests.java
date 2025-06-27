@@ -77,7 +77,7 @@ public class GameLogEntryServiceTests {
         when(rawgService.getGameDetails(rawgId)).thenReturn(gameDetails);
         when(gameLogRepository.save(any(GameLogEntry.class))).thenReturn(savedEntry);
 
-        GameLogEntryResponseDTO result = gameLogEntryService.addGameToGameLog(userId, request);
+        GameLogEntryResponseDTO result = gameLogEntryService.addGameToLog(userId, request);
 
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
@@ -103,7 +103,7 @@ public class GameLogEntryServiceTests {
 
         // assertThrows() verifies that the method throws the expected exception
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            gameLogEntryService.addGameToGameLog(nonExistentUserId, request);
+            gameLogEntryService.addGameToLog(nonExistentUserId, request);
         });
 
         // verify the exception message contains helpful information
