@@ -102,5 +102,4 @@ public class RawgService {
             throw new RuntimeException(e.getMessage());
         }
     }
-
 }
