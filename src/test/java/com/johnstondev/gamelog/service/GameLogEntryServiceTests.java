@@ -374,4 +374,69 @@ public class GameLogEntryServiceTests {
         verify(gameLogRepository, times(1)).findByIdAndUserId(nonExistentEntryId, userId);
         verify(gameLogRepository, never()).save(any(GameLogEntry.class));
     }
+
+    @Test
+    public void removeGameFromGameLogSuccess() {
+
+        Long userId = 1L;
+        Long entryId = 1L;
+
+        GameLogEntry mockEntry = new GameLogEntry();
+        mockEntry.setId(entryId);
+        mockEntry.setRawgId(12345L);
+        mockEntry.setGameTitle("Zelda: Breath of the Wild");
+        mockEntry.setStatus(GameStatus.COMPLETED);
+
+        // config. mocks
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(gameLogRepository.findByIdAndUserId(entryId, userId))
+                .thenReturn(Optional.of(mockEntry));
+        doNothing().when(gameLogRepository).delete(mockEntry);
+
+        gameLogEntryService.removeGameFromGameLog(userId, entryId);
+
+        verify(userRepository, times(1)).existsById(userId);
+        verify(gameLogRepository, times(1)).findByIdAndUserId(entryId, userId);
+        verify(gameLogRepository, times(1)).delete(mockEntry);
+    }
+
+    @Test
+    public void removeGameFromLibraryUserNotFound() {
+
+        Long nonExistentUserId = 999L;
+        Long entryId = 1L;
+
+        when(userRepository.existsById(nonExistentUserId)).thenReturn(false);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            gameLogEntryService.removeGameFromGameLog(nonExistentUserId, entryId);
+        });
+
+        assertThat(exception.getMessage()).contains("User not found with id: " + nonExistentUserId);
+
+        // should not attempt to find or delete entry if user DNE
+        verify(gameLogRepository, never()).findByIdAndUserId(any(), any());
+        verify(gameLogRepository, never()).delete(any());
+    }
+
+    @Test
+    public void removeGameFromGameLogEntryNotFound() {
+
+        Long userId = 1L;
+        Long nonExistentEntryId = 999L;
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(gameLogRepository.findByIdAndUserId(nonExistentEntryId, userId))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            gameLogEntryService.removeGameFromGameLog(userId, nonExistentEntryId);
+        });
+
+        assertThat(exception.getMessage())
+                .contains("Game log entry not found with id: " + nonExistentEntryId + " for user: " + userId);
+
+        // should not attempt to delete if entry not found
+        verify(gameLogRepository, never()).delete(any());
+    }
 }
