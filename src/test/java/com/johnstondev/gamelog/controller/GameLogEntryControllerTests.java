@@ -46,7 +46,7 @@ public class GameLogEntryControllerTests {
                 GameStatus.PLANNING, 8, LocalDateTime.now(), LocalDateTime.now()
         );
 
-        when(gameLogEntryService.addGameToLog(userId, request)).thenReturn(mockResponse);
+        when(gameLogEntryService.addGameToLog(eq(userId), any(AddGameRequestDTO.class))).thenReturn(mockResponse);
 
         String requestBody = """
             {
