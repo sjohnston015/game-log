@@ -192,4 +192,67 @@ public class GameLogEntryServiceTests {
         // security check --- should NOT query for games if user doesn't exist
         verify(gameLogRepository, never()).findByUserId(any());
     }
+
+    @Test
+    public void getUserGameLogFilteredForCompleted() {
+
+        Long userId = 1L;
+        GameStatus targetStatus = GameStatus.COMPLETED;
+        User mockUser = new User();
+        mockUser.setId(userId);
+        mockUser.setUsername("user");
+        mockUser.setEmail("user@email.com");
+
+        // create game entries with COMPLETED status (filtering)
+        GameLogEntry completedGame1 = new GameLogEntry();
+        completedGame1.setId(1L);
+        completedGame1.setUser(mockUser);
+        completedGame1.setRawgId(111L);
+        completedGame1.setGameTitle("Zelda: Breath of the Wild");
+        completedGame1.setGameCoverImage("https://media.rawg.io/media/games/zelda.jpg");
+        completedGame1.setStatus(GameStatus.COMPLETED);
+        completedGame1.setRating(10);
+        completedGame1.setAddedAt(LocalDateTime.now().minusDays(10));
+        completedGame1.setUpdatedAt(LocalDateTime.now().minusDays(5));
+
+        GameLogEntry completedGame2 = new GameLogEntry();
+        completedGame2.setId(2L);
+        completedGame2.setUser(mockUser);
+        completedGame2.setRawgId(222L);
+        completedGame2.setGameTitle("Elden Ring");
+        completedGame2.setGameCoverImage("https://media.rawg.io/media/games/elden.jpg");
+        completedGame2.setStatus(GameStatus.COMPLETED);
+        completedGame2.setRating(9);
+        completedGame2.setAddedAt(LocalDateTime.now().minusDays(7));
+        completedGame2.setUpdatedAt(LocalDateTime.now().minusDays(2));
+
+        List<GameLogEntry> completedGames = Arrays.asList(completedGame1, completedGame2);
+
+        // config. mocks
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(gameLogRepository.findByUserIdAndStatus(userId, targetStatus)).thenReturn(completedGames);
+
+        List<GameLogEntryResponseDTO> result = gameLogEntryService.getUserGameLogByStatus(userId, targetStatus);
+
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(2);
+
+        // verify first game
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        assertThat(result.get(0).getRawgGameId()).isEqualTo(111L);
+        assertThat(result.get(0).getGameTitle()).isEqualTo("Zelda: Breath of the Wild");
+        assertThat(result.get(0).getStatus()).isEqualTo(GameStatus.COMPLETED);
+        assertThat(result.get(0).getRating()).isEqualTo(10);
+
+        // verify second game
+        assertThat(result.get(1).getId()).isEqualTo(2L);
+        assertThat(result.get(1).getRawgGameId()).isEqualTo(222L);
+        assertThat(result.get(1).getGameTitle()).isEqualTo("Elden Ring");
+        assertThat(result.get(1).getStatus()).isEqualTo(GameStatus.COMPLETED);
+        assertThat(result.get(1).getRating()).isEqualTo(9);
+
+        // verify interactions
+        verify(userRepository, times(1)).existsById(userId);
+        verify(gameLogRepository, times(1)).findByUserIdAndStatus(userId, targetStatus);
+    }
 }
