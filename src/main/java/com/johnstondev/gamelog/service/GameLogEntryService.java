@@ -103,8 +103,17 @@ public class GameLogEntryService {
         return convertToResponseDTO(savedEntry);
     }
 
-    public void removeGameFromLibrary(Long userId, Long entryId) {
-        // find entry to delete by user id and entry id and then delete the game from user's gamelog
+    public void removeGameFromGameLog(Long userId, Long entryId) {
+
+        verifyUserExists(userId);
+
+        // find and delete entry - safely
+        GameLogEntry entry = gameLogRepository.findByIdAndUserId(entryId, userId)
+                .orElseThrow(() -> new RuntimeException(
+                        "Game log entry not found with id: " + entryId + " for user: " + userId));
+
+        // delete entry
+        gameLogRepository.delete(entry);
     }
 
     // ----- helper methods -----
