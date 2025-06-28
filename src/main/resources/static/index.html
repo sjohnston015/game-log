@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Game Log</title>
+</head>
+<body>
+<h1>My Game Library</h1>
+<input type="text" id="searchInput" placeholder="Search games...">
+<button onclick="searchGames()">Search</button>
+<div id="results"></div>
+
+<script>
+  async function searchGames() {
+      const query = document.getElementById('searchInput').value;
+      const response = await fetch(`http://localhost:8080/api/games/search?q=${query}`);
+      const games = await response.json();
+
+      document.getElementById('results').innerHTML = games
+          .map(game => `<div>${game.name}</div>`)
+          .join('');
+  }
+</script>
+</body>
+</html>
