@@ -75,7 +75,32 @@ public class RawgService {
 
     // get detailed info about one specific game
     public GameDetailDTO getGameDetails(Long rawgId) {
-        return null;
+
+        // build URL for specific game endpoint
+        String url = UriComponentsBuilder.fromUriString(baseUrl + "/games/" + rawgId)
+                .queryParam("key", apiKey)
+                .toUriString();
+
+        try {
+            // get raw response for debugging
+            String rawResponse = restTemplate.getForObject(url, String.class);
+            System.out.println("Raw game details response: " + (rawResponse != null ?
+                    rawResponse.substring(0, Math.min(200, rawResponse.length())) + "..." : "null"));
+
+            // parse to DTO
+            GameDetailDTO gameDetails = restTemplate.getForObject(url, GameDetailDTO.class);
+
+            // validate response
+            if (gameDetails != null && gameDetails.getName() != null) {
+                System.out.println("Successfully fetched game: " + gameDetails.getName());
+                return gameDetails;
+            } else {
+                throw new RuntimeException("Game not found or invalid response for RAWG ID: " + rawgId);
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
 }
