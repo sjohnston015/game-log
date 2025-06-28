@@ -61,12 +61,14 @@ public class GameLogEntryService {
         return userGameLog;
     }
 
-    public List<GameLogEntryResponseDTO> getUserLibraryByStatus(Long userId, GameStatus status) {
-        // verify user is NOT a myth...
-        // filter entries from repository
-        // convert to response DTOs
-        // return list of DTOs
-        return null;
+    public List<GameLogEntryResponseDTO> getUserGameLogByStatus(Long userId, GameStatus status) {
+        // verify user is not a myth and filter data from repo
+        // this is where I use a stream -- streams are good at filtering data
+        verifyUserExists(userId);
+        return gameLogRepository.findAll().stream()
+                .filter(entry -> entry.getStatus() == status)
+                .map(this :: convertToResponseDTO) // convert to response DTOs -> return as list of DTOs
+                .toList();
     }
 
     public GameLogEntryResponseDTO updateGameLogEntry(Long userId, Long entryId, UpdateGameRequestDTO request) {
