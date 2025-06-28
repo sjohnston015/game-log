@@ -45,7 +45,7 @@ public class GameLogEntryController {
             List<GameLogEntryResponseDTO> gameLog = gameLogEntryService.getUserGameLog(userId);
             return ResponseEntity.ok(gameLog);
         } catch (RuntimeException e) {
-            System.err.println("Error fetching user game library: " + e.getMessage());
+            System.err.println("Error fetching user game gamelog: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -81,16 +81,16 @@ public class GameLogEntryController {
         }
     }
 
-    // DELETE /api/users/{userId}/games/{entryId} - remove game from library
+    // DELETE /api/users/{userId}/games/{entryId} - remove game from gamelog
     @DeleteMapping("/{entryId}")
-    public ResponseEntity<Void> removeGameFromLibrary(
+    public ResponseEntity<Void> removeGameFromGameLog(
             @PathVariable Long userId,
             @PathVariable Long entryId) {
         try {
             gameLogEntryService.removeGameFromGameLog(userId, entryId);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            System.err.println("Error removing game from library: " + e.getMessage());
+            System.err.println("Error removing game from gamelog: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
