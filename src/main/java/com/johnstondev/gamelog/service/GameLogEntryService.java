@@ -62,13 +62,18 @@ public class GameLogEntryService {
     }
 
     public List<GameLogEntryResponseDTO> getUserGameLogByStatus(Long userId, GameStatus status) {
+
         // verify user is not a myth and filter data from repo
-        // this is where I use a stream -- streams are good at filtering data
         verifyUserExists(userId);
-        return gameLogRepository.findAll().stream()
-                .filter(entry -> entry.getStatus() == status)
-                .map(this :: convertToResponseDTO) // convert to response DTOs -> return as list of DTOs
-                .toList();
+        List<GameLogEntry> entries = gameLogRepository.findByUserIdAndStatus(userId, status);
+
+        // convert each entry to response DTO and return
+        List<GameLogEntryResponseDTO> filtered = new ArrayList<>();
+        for (GameLogEntry entry : entries) {
+            filtered.add(convertToResponseDTO(entry));
+        }
+
+        return filtered;
     }
 
     public GameLogEntryResponseDTO updateGameLogEntry(Long userId, Long entryId, UpdateGameRequestDTO request) {

@@ -255,4 +255,44 @@ public class GameLogEntryServiceTests {
         verify(userRepository, times(1)).existsById(userId);
         verify(gameLogRepository, times(1)).findByUserIdAndStatus(userId, targetStatus);
     }
+
+    @Test
+    public void getUserGameLogByStatusUserNotFound() {
+
+        Long nonExistentUserId = 999L;
+        GameStatus targetStatus = GameStatus.COMPLETED;
+
+        // config. mock to return false (user DNE)
+        when(userRepository.existsById(nonExistentUserId)).thenReturn(false);
+
+        // expecting runtime exception to be thrown
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            gameLogEntryService.getUserGameLogByStatus(nonExistentUserId, targetStatus);
+        });
+
+        // verify exception message contains helpful information
+        assertThat(exception.getMessage()).contains("User not found with id: " + nonExistentUserId);
+
+        // security verification - should NOT query for game entries if user DNE
+        verify(userRepository, times(1)).existsById(nonExistentUserId);
+        verify(gameLogRepository, never()).findByUserIdAndStatus(any(), any());
+    }
+
+    @Test
+    public void getUserGameLogByStatusDatabaseException() {
+
+        Long userId = 1L;
+        GameStatus targetStatus = GameStatus.PLAYING;
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(gameLogRepository.findByUserIdAndStatus(userId, targetStatus))
+                .thenThrow(new RuntimeException("Database connection failed"));
+
+        // should propagate the database exception
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            gameLogEntryService.getUserGameLogByStatus(userId, targetStatus);
+        });
+
+        assertThat(exception.getMessage()).contains("Database connection failed");
+    }
 }
