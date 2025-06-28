@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GameLogEntryService {
@@ -77,11 +78,29 @@ public class GameLogEntryService {
     }
 
     public GameLogEntryResponseDTO updateGameLogEntry(Long userId, Long entryId, UpdateGameRequestDTO request) {
-        // find entry by user and entry id - think about security though as well
-        // update only status/rating fields (for now)
-        // save updated entry
-        // convert to response DTO and return
-        return null;
+
+        // find entry by user and entry id - using Optional for safety
+        Optional<GameLogEntry> entryOptional = gameLogRepository.findByIdAndUserId(entryId, userId);
+
+        // check if entry exists and belongs to this user (security!!!)
+        if (entryOptional.isEmpty()) {
+            throw new RuntimeException("Game log entry not found with id: " + entryId + " for user: " + userId);
+        }
+
+        GameLogEntry entry = entryOptional.get();
+
+        // update only status/rating fields if they are provided -> partial updates
+        if (request.getStatus() != null) {
+            entry.setStatus(request.getStatus());
+        }
+
+        if (request.getRating() != null) {
+            entry.setRating(request.getRating());
+        }
+
+        // save updated entry; convert to response DTO and return
+        GameLogEntry savedEntry = gameLogRepository.save(entry);
+        return convertToResponseDTO(savedEntry);
     }
 
     public void removeGameFromLibrary(Long userId, Long entryId) {

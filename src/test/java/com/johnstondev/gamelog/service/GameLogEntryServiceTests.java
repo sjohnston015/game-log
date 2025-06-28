@@ -3,6 +3,7 @@ package com.johnstondev.gamelog.service;
 import com.johnstondev.gamelog.dto.AddGameRequestDTO;
 import com.johnstondev.gamelog.dto.GameDetailDTO;
 import com.johnstondev.gamelog.dto.GameLogEntryResponseDTO;
+import com.johnstondev.gamelog.dto.UpdateGameRequestDTO;
 import com.johnstondev.gamelog.model.GameLogEntry;
 import com.johnstondev.gamelog.model.GameStatus;
 import com.johnstondev.gamelog.model.User;
@@ -294,5 +295,83 @@ public class GameLogEntryServiceTests {
         });
 
         assertThat(exception.getMessage()).contains("Database connection failed");
+    }
+
+    @Test
+    public void updateGameLogEntrySuccess() {
+
+        Long userId = 1L;
+        Long entryId = 1L;
+
+        User mockUser = new User();
+        mockUser.setId(userId);
+        mockUser.setUsername("testuser");
+
+        // create existing entry with original values
+        GameLogEntry existingEntry = new GameLogEntry();
+        existingEntry.setId(entryId);
+        existingEntry.setUser(mockUser);
+        existingEntry.setRawgId(12345L);
+        existingEntry.setGameTitle("Zelda: Breath of the Wild");
+        existingEntry.setGameCoverImage("https://media.rawg.io/media/games/zelda.jpg");
+        existingEntry.setStatus(GameStatus.PLAYING);  // with original status
+        existingEntry.setRating(null);                // with no rating initially
+        existingEntry.setAddedAt(LocalDateTime.now().minusDays(5));
+        existingEntry.setUpdatedAt(LocalDateTime.now().minusDays(1));
+
+        // create update request - changing status and adding rating
+        UpdateGameRequestDTO request = new UpdateGameRequestDTO();
+        request.setStatus(GameStatus.COMPLETED);
+        request.setRating(9);
+
+        // config. mocks
+        when(gameLogRepository.findByIdAndUserId(entryId, userId))
+                .thenReturn(Optional.of(existingEntry));
+        when(gameLogRepository.save(existingEntry)).thenReturn(existingEntry);
+
+        GameLogEntryResponseDTO result = gameLogEntryService.updateGameLogEntry(userId, entryId, request);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(entryId);
+        assertThat(result.getRawgGameId()).isEqualTo(12345L);               // should remain unchanged
+        assertThat(result.getGameTitle()).isEqualTo("Zelda: Breath of the Wild"); // should remain unchanged
+        assertThat(result.getGameCoverImage()).isEqualTo("https://media.rawg.io/media/games/zelda.jpg"); // should remain unchanged
+        assertThat(result.getStatus()).isEqualTo(GameStatus.COMPLETED);     // should be updated
+        assertThat(result.getRating()).isEqualTo(9);                       // should be updated
+
+        // verify repository interactions
+        verify(gameLogRepository, times(1)).findByIdAndUserId(entryId, userId);
+        verify(gameLogRepository, times(1)).save(existingEntry);
+
+        // verify the actual entity was modified correctly
+        assertThat(existingEntry.getStatus()).isEqualTo(GameStatus.COMPLETED);
+        assertThat(existingEntry.getRating()).isEqualTo(9);
+    }
+
+    @Test
+    public void updateGameLogEntryNotFoundThrowsException() {
+
+        Long userId = 1L;
+        Long nonExistentEntryId = 999L;
+
+        UpdateGameRequestDTO request = new UpdateGameRequestDTO();
+        request.setStatus(GameStatus.COMPLETED);
+        request.setRating(8);
+
+        // config. mock to return empty Optional (entry not found)
+        when(gameLogRepository.findByIdAndUserId(nonExistentEntryId, userId))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            gameLogEntryService.updateGameLogEntry(userId, nonExistentEntryId, request);
+        });
+
+        // verify exception message contains helpful information
+        assertThat(exception.getMessage())
+                .contains("Game log entry not found with id: " + nonExistentEntryId + " for user: " + userId);
+
+        // security verification - should NOT attempt to save if entry not found
+        verify(gameLogRepository, times(1)).findByIdAndUserId(nonExistentEntryId, userId);
+        verify(gameLogRepository, never()).save(any(GameLogEntry.class));
     }
 }
