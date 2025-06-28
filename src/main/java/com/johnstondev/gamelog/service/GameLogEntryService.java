@@ -53,10 +53,12 @@ public class GameLogEntryService {
         List<GameLogEntryResponseDTO> userGameLog = new ArrayList<>();
 
         // convert each entry to response DTO and add to return list
-        // I learned about streams -- really cool because I'm familiar with function languages like Ocaml
-        return entries.stream()
-                .map(this::convertToResponseDTO)
-                .toList();
+        // after researching for a bit - deciding to implement this method w/o using streams
+        for (GameLogEntry entry : entries) {
+            userGameLog.add(convertToResponseDTO(entry));
+        }
+
+        return userGameLog;
     }
 
     public List<GameLogEntryResponseDTO> getUserLibraryByStatus(Long userId, GameStatus status) {
