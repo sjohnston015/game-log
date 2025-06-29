@@ -171,6 +171,6 @@ frontend ideas, etc.
 
 ---
 
-*Project Started: June 20th, 2025 | Status: Updated on June 28th, 2025*
+***Author: Seth Johnston*** | *Project Started: June 20th, 2025 | Status: Updated on June 28th, 2025*
 
 
