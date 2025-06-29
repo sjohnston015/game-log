@@ -8,40 +8,127 @@
 
 body {
   font-family: 'Orbitron', monospace;
-  background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
-  background-size: 400% 400%;
-  animation: gradientShift 8s ease infinite;
-  color: #000;
-  overflow-x: hidden;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  overflow: hidden; /* Prevent scrollbars on desktop */
 }
 
 .App {
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
 }
 
-/* Header */
-.header {
+/* Top taskbar */
+.taskbar {
+  height: 30px;
   background: linear-gradient(180deg, #c0c0c0 0%, #808080 100%);
-  border-bottom: 2px solid #000;
+  border-bottom: 1px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 1000;
 }
 
-.window-titlebar {
+.taskbar-start {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+}
+
+.start-button {
+  background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 100%);
+  border: 1px outset #c0c0c0;
   padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.start-button:hover {
+  background: linear-gradient(180deg, #f0f0f0 0%, #dfdfdf 100%);
+}
+
+.taskbar-time {
+  font-size: 11px;
+  padding: 4px 8px;
+  background: #f0f0f0;
+  border: 1px inset #c0c0c0;
+}
+
+/* Desktop area */
+.desktop {
+  flex: 1;
+  position: relative;
+  background: linear-gradient(45deg, #ff69b4, #00bfff, #98fb98, #ffa500);
+  background-size: 400% 400%;
+  animation: desktopGradient 15s ease infinite;
+  overflow: hidden;
+}
+
+@keyframes desktopGradient {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Bottom taskbar */
+.bottom-taskbar {
+  height: 25px;
+  background: #c0c0c0;
+  border-top: 1px solid #808080;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 10px;
+}
+
+.status-indicators {
+  display: flex;
+  gap: 10px;
+}
+
+.status-indicators span {
+  padding: 2px 6px;
+  background: #f0f0f0;
+  border: 1px inset #c0c0c0;
+  font-size: 10px;
+}
+
+/* Draggable Window Styles */
+.draggable-window {
+  position: absolute;
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  min-width: 300px;
+  min-height: 200px;
+  z-index: 100;
+}
+
+.window-titlebar-draggable {
+  height: 20px;
   background: linear-gradient(90deg, #0080ff, #004080);
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 8px;
+  font-size: 12px;
   font-weight: bold;
-  font-size: 14px;
+  cursor: move;
+  user-select: none;
+}
+
+.window-titlebar-draggable:hover {
+  background: linear-gradient(90deg, #4da6ff, #0066cc);
+}
+
+.window-title {
+  font-size: 12px;
 }
 
 .window-controls {
@@ -50,11 +137,11 @@ body {
 }
 
 .control-btn {
-  width: 18px;
-  height: 14px;
+  width: 16px;
+  height: 12px;
   background: #c0c0c0;
   border: 1px outset #c0c0c0;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: bold;
   cursor: pointer;
   display: flex;
@@ -66,48 +153,36 @@ body {
   background: #dfdfdf;
 }
 
-/* Main content */
-.main-content {
-  flex: 1;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+.control-btn:active {
+  border: 1px inset #c0c0c0;
 }
 
-/* Window */
-.window {
-  background: #c0c0c0;
-  border: 2px outset #c0c0c0;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  margin: 10px auto;
-  max-width: 600px;
-}
-
-.window-header {
-  background: linear-gradient(90deg, #0080ff, #004080);
-  color: white;
-  padding: 8px 12px;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.window-content {
-  padding: 20px;
+/* Window content area */
+.window-content-area {
+  padding: 16px;
   background: #f0f0f0;
+  height: calc(100% - 20px);
+  overflow: auto;
+}
+
+/* Welcome content styling */
+.welcome-content {
   text-align: center;
 }
 
-.window-content h1 {
-  margin-bottom: 16px;
+.welcome-content h1 {
   color: #004080;
+  margin-bottom: 16px;
+  font-size: 20px;
 }
 
-.window-content p {
-  margin-bottom: 20px;
-  font-size: 16px;
+.welcome-content p {
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-/* Button */
+/* Button styling */
 .button {
   background: linear-gradient(45deg, #ff00ff, #00ffff);
   border: 2px solid #fff;
@@ -119,6 +194,7 @@ body {
   text-transform: uppercase;
   box-shadow: 3px 3px 0px #000;
   transition: all 0.1s;
+  margin-top: 16px;
 }
 
 .button:hover {
@@ -132,28 +208,7 @@ body {
   box-shadow: 1px 1px 0px #000;
 }
 
-/* Footer */
-.footer {
-  background: #c0c0c0;
-  border-top: 1px solid #808080;
-}
-
-.status-bar {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 8px;
-  font-size: 12px;
-  background: #f0f0f0;
-  border: 1px inset #c0c0c0;
-}
-
-.status-bar span {
-  padding: 2px 6px;
-  background: #dfdfdf;
-  border: 1px inset #dfdfdf;
-}
-
-/* Loading animation for future use */
+/* Loading and message styles for future use */
 .loading {
   display: flex;
   align-items: center;
@@ -174,7 +229,6 @@ body {
   60%, 100% { content: '...'; }
 }
 
-/* Error and success messages for future use */
 .error-message {
   background: #ff4444;
   color: white;
