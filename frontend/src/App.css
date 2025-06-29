@@ -1,252 +1,154 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap');
+/* Import Google Fonts for better typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+/* CSS Reset and Global Styles */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: 'Orbitron', monospace;
-  overflow: hidden; /* Prevent scrollbars on desktop */
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #111827; /* Dark background as fallback */
+  color: #ffffff;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
+/* App Container */
 .App {
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
+  text-align: left; /* Reset text alignment */
+  min-height: 100vh;
 }
 
-/* Top taskbar */
-.taskbar {
-  height: 30px;
-  background: linear-gradient(180deg, #c0c0c0 0%, #808080 100%);
-  border-bottom: 1px solid #000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 8px;
-  font-size: 12px;
-  font-weight: bold;
-  z-index: 1000;
+/* Custom Scrollbar for Dark Theme */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.taskbar-start {
-  display: flex;
-  align-items: center;
+::-webkit-scrollbar-track {
+  background: #1f2937; /* gray-800 */
 }
 
-.start-button {
-  background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 100%);
-  border: 1px outset #c0c0c0;
-  padding: 4px 8px;
-  font-size: 11px;
-  cursor: pointer;
+::-webkit-scrollbar-thumb {
+  background: #4b5563; /* gray-600 */
+  border-radius: 4px;
 }
 
-.start-button:hover {
-  background: linear-gradient(180deg, #f0f0f0 0%, #dfdfdf 100%);
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280; /* gray-500 */
 }
 
-.taskbar-time {
-  font-size: 11px;
-  padding: 4px 8px;
-  background: #f0f0f0;
-  border: 1px inset #c0c0c0;
+/* Focus styles for better accessibility */
+*:focus {
+  outline: 2px solid #10b981; /* green-500 */
+  outline-offset: 2px;
 }
 
-/* Desktop area */
-.desktop {
-  flex: 1;
-  position: relative;
-  background: linear-gradient(45deg, #ff69b4, #00bfff, #98fb98, #ffa500);
-  background-size: 400% 400%;
-  animation: desktopGradient 15s ease infinite;
-  overflow: hidden;
+/* Remove focus outline for mouse users, keep for keyboard users */
+*:focus:not(:focus-visible) {
+  outline: none;
 }
 
-@keyframes desktopGradient {
-  0% { background-position: 0% 50%; }
-  25% { background-position: 100% 50%; }
-  50% { background-position: 100% 100%; }
-  75% { background-position: 0% 100%; }
-  100% { background-position: 0% 50%; }
+/* Custom button focus styles */
+button:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
 }
 
-/* Bottom taskbar */
-.bottom-taskbar {
-  height: 25px;
-  background: #c0c0c0;
-  border-top: 1px solid #808080;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 8px;
-  font-size: 10px;
+/* Smooth transitions for all interactive elements */
+button,
+input,
+textarea,
+select {
+  transition: all 0.2s ease-in-out;
 }
 
-.status-indicators {
-  display: flex;
-  gap: 10px;
+/* Loading animation classes (for future use) */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
-.status-indicators span {
-  padding: 2px 6px;
-  background: #f0f0f0;
-  border: 1px inset #c0c0c0;
-  font-size: 10px;
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Draggable Window Styles */
-.draggable-window {
-  position: absolute;
-  background: #c0c0c0;
-  border: 2px outset #c0c0c0;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  min-width: 300px;
-  min-height: 200px;
-  z-index: 100;
+/* Fade in animation for page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.window-titlebar-draggable {
-  height: 20px;
-  background: linear-gradient(90deg, #0080ff, #004080);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 2px 8px;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: move;
-  user-select: none;
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
 }
 
-.window-titlebar-draggable:hover {
-  background: linear-gradient(90deg, #4da6ff, #0066cc);
+/* Custom gradient backgrounds for special elements */
+.gradient-green {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
-.window-title {
-  font-size: 12px;
+.gradient-text-green {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.window-controls {
-  display: flex;
-  gap: 2px;
+/* Glass morphism utility class */
+.glass {
+  background: rgba(31, 41, 55, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(75, 85, 99, 0.3);
 }
 
-.control-btn {
-  width: 16px;
-  height: 12px;
-  background: #c0c0c0;
-  border: 1px outset #c0c0c0;
-  font-size: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Print styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
 }
 
-.control-btn:hover {
-  background: #dfdfdf;
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ffffff;
+  }
 }
 
-.control-btn:active {
-  border: 1px inset #c0c0c0;
-}
-
-/* Window content area */
-.window-content-area {
-  padding: 16px;
-  background: #f0f0f0;
-  height: calc(100% - 20px);
-  overflow: auto;
-}
-
-/* Welcome content styling */
-.welcome-content {
-  text-align: center;
-}
-
-.welcome-content h1 {
-  color: #004080;
-  margin-bottom: 16px;
-  font-size: 20px;
-}
-
-.welcome-content p {
-  margin-bottom: 12px;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-/* Button styling */
-.button {
-  background: linear-gradient(45deg, #ff00ff, #00ffff);
-  border: 2px solid #fff;
-  color: #000;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  padding: 12px 20px;
-  cursor: pointer;
-  text-transform: uppercase;
-  box-shadow: 3px 3px 0px #000;
-  transition: all 0.1s;
-  margin-top: 16px;
-}
-
-.button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0px #000;
-  background: linear-gradient(45deg, #00ffff, #ff00ff);
-}
-
-.button:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px #000;
-}
-
-/* Loading and message styles for future use */
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 12px;
-  color: #ff00ff;
-}
-
-.loading::after {
-  content: '...';
-  animation: dots 1.5s infinite;
-}
-
-@keyframes dots {
-  0%, 20% { content: '.'; }
-  40% { content: '..'; }
-  60%, 100% { content: '...'; }
-}
-
-.error-message {
-  background: #ff4444;
-  color: white;
-  padding: 12px;
-  border: 2px solid #cc0000;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  text-align: center;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.success-message {
-  background: #44ff44;
-  color: #000;
-  padding: 12px;
-  border: 2px solid #00cc00;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  text-align: center;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
