@@ -27,7 +27,7 @@ const SearchResults = () => {
       }
 
       const data = await response.json();
-      setGames(data.results || []); // backend returns - results: [...]
+      setGames(Array.isArray(data) ? data : []);  // backend returns AN ARRAY DIRECTLY ! AHAHAHAH
     } catch (err) {
       setError(err.message);
       console.error('Search error:', err);
