@@ -1,9 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
+
+// --- import page components ---
 import Homepage from './components/Homepage';
-
-
+import SearchResults from './components/SearchResults';
+import UserGameLog from './components/UserGameLog';
+import UserProfile from './components/UserProfile';
 
 function App() {
   return (

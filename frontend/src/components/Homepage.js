@@ -52,9 +52,9 @@ const Homepage = () => {
           <div className="text-center">
             {/* Main Heading */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-              Track Your
+              What Have
               <span className="block bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 bg-clip-text text-transparent">
-                Gaming Journey
+                You Played?
               </span>
             </h1>
 
