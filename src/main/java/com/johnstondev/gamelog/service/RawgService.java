@@ -108,14 +108,25 @@ public class RawgService {
     }
 
     private boolean isRelevantResult(GameSearchResultDTO game, String queryLower) {
-        // get game name and convert to lowercase
-        // split queryLower by spaces to get individual words
-        // check if game name contains at least one query word
-        // use Arrays.stream(queryWords).anyMatch(word -> gameName.contains(word))
-        // return false if rating is not null and < 2.0
+
+        String gameName = game.getName().toLowerCase();
+
+        // must contain at least one word from the query
+        String[] queryWords = queryLower.split("\\s+");
+        boolean containsQueryWord = Arrays.stream(queryWords)
+                .anyMatch(gameName::contains);
+
+        if (!containsQueryWord) {
+            return false;
+        }
+
+        if (game.getRating() != null && game.getRating() < 2.0) {
+            return false;
+        }
+
         // return false if ratingsCount is not null and < 5
         // return true if all checks pass
-        return false;
+        return game.getRatingsCount() == null || game.getRatingsCount() >= 5;
     }
 
     private double calculateRelevanceScore(GameSearchResultDTO game, String queryLower) {
