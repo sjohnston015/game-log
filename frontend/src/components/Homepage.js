@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Homepage = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const handleSearch = () => {
-    // TODO: Implement search functionality
-    console.log('Searching for:', searchQuery);
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -15,30 +18,7 @@ const Homepage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Navigation Header */}
-      <nav className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">GL</span>
-              </div>
-              <h1 className="text-xl font-bold text-white">Game Log</h1>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <button className="text-gray-300 hover:text-white transition-colors duration-200">
-                Sign In
-              </button>
-              <button className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-medium">
-                Get Started
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <>
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         {/* Background Pattern */}
@@ -52,9 +32,9 @@ const Homepage = () => {
           <div className="text-center">
             {/* Main Heading */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-              What Have
+              Track Your
               <span className="block bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 bg-clip-text text-transparent">
-                You Played?
+                Gaming Journey
               </span>
             </h1>
 
@@ -64,12 +44,12 @@ const Homepage = () => {
               Rate games, share reviews, and never forget what to play next.
             </p>
 
-            {/* Search Bar */}
+            {/* Homepage-specific Search Bar (Larger, More Prominent) */}
             <div className="max-w-2xl mx-auto mb-16">
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search for games..."
+                  placeholder="Search for games to get started..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
@@ -152,7 +132,7 @@ const Homepage = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 };
 
