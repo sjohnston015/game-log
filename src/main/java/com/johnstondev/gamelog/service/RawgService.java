@@ -110,22 +110,48 @@ public class RawgService {
     private boolean isRelevantResult(GameSearchResultDTO game, String queryLower) {
 
         String gameName = game.getName().toLowerCase();
-
-        // must contain at least one word from the query
         String[] queryWords = queryLower.split("\\s+");
-        boolean containsQueryWord = Arrays.stream(queryWords)
-                .anyMatch(gameName::contains);
 
-        if (!containsQueryWord) {
-            return false;
+        // for multi-word searches, require better matching
+        if (queryWords.length > 1) {
+            boolean isRelevant = false;
+            // -- game must contain the full phrase
+            if (gameName.contains(queryLower)) {
+                isRelevant = true;
+            }
+            // -- game must contain ALL words from the query
+            else if (Arrays.stream(queryWords).allMatch(gameName::contains)) {
+                isRelevant = true;
+            }
+            // -- game contains most words and has high relevance
+            else {
+                long matchingWords = Arrays.stream(queryWords)
+                        .mapToLong(word -> gameName.contains(word) ? 1 : 0)
+                        .sum();
+
+                // require at least 50% of words to match for multi-word queries
+                if (matchingWords >= Math.ceil(queryWords.length * 0.5)) {
+                    isRelevant = true;
+                }
+            }
+
+            // if none of the above conditions were met, this game is not relevant
+            if (!isRelevant) {
+                return false;
+            }
+
+        } else {
+            // for single word queries, use the original logic
+            if (!gameName.contains(queryWords[0])) {
+                return false;
+            }
         }
 
+        // filter out games with very low ratings or few reviews
         if (game.getRating() != null && game.getRating() < 2.0) {
             return false;
         }
 
-        // return false if ratingsCount is not null and < 5
-        // return true if all checks pass
         return game.getRatingsCount() == null || game.getRatingsCount() >= 5;
     }
 
