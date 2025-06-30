@@ -2,12 +2,12 @@ package com.johnstondev.gamelog.service;
 
 import com.johnstondev.gamelog.dto.GameDetailDTO;
 import com.johnstondev.gamelog.dto.GameSearchResultDTO;
-import com.johnstondev.gamelog.dto.RawgSearchResponseDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -26,46 +26,22 @@ public class RawgService {
         this.baseUrl = baseUrl;
     }
 
+    // --- fixing searchGames() function and adding helpers to improve search result quality ---
+
     // simple search - user types "zelda", gets games
     public List<GameSearchResultDTO> searchGames(String query) {
-
-        System.out.println("API Key: " + (apiKey != null ? "LOADED" : "NULL"));
-        System.out.println("Base URL: " + baseUrl);
-
-        // build the url -> http call -> extract and return
-        String url = UriComponentsBuilder.fromUriString(baseUrl + "/games")
-                .queryParam("key", apiKey)
-                .queryParam("search", query)
-                .queryParam("page_size", 20)
-                .queryParam("ordering", "-rating")
-                .toUriString();
-
-        System.out.println("Final URL: " + url);
-
-        try {
-            // Try to get the raw response first
-            String rawResponse = restTemplate.getForObject(url, String.class);
-            System.out.println("Raw Response: " + rawResponse);
-
-            // Then try to parse it
-            RawgSearchResponseDTO response = restTemplate.getForObject(url, RawgSearchResponseDTO.class);
-
-            if (response != null && response.getResults() != null) {
-                System.out.println("Found " + response.getResults().size() + " games");
-                return response.getResults();
-            } else {
-                System.out.println("Response or results was null");
-                return List.of();
-            }
-
-        } catch (Exception e) {
-            System.out.println("Exception type: " + e.getClass().getSimpleName());
-            System.out.println("Exception message: " + e.getMessage());
-            e.printStackTrace(); // This will show the full stack trace
-            throw new RuntimeException("Failed to search games: " + e.getMessage(), e);
-
-        }
-
+        // build URL with parameters
+        // - search: the query
+        // - page_size: 40
+        // - ordering: "-relevance,-rating,-added"
+        // - search_precise: true
+        // - search_exact: false
+        // Make API call with restTemplate.getForObject()
+        // if response is not null and has results
+        // call improveSearchResults(query, response.getResults())
+        // else return empty list
+        // wrap in try-catch and throw RuntimeException on error
+        return null;
     }
 
     // advanced search - with pagination
@@ -101,5 +77,60 @@ public class RawgService {
             System.err.println(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    private List<GameSearchResultDTO> improveSearchResults(String query, List<GameSearchResultDTO> rawResults) {
+        // convert query to lowercase
+        // use stream() to:
+        // .filter() with isRelevantResult()
+        // .sorted() with calculateRelevanceScore()
+        // .limit(20)
+        // .collect(Collectors.toList())
+        return null;
+    }
+
+    /**
+     * Filter out clearly irrelevant results
+     */
+    private boolean isRelevantResult(GameSearchResultDTO game, String queryLower) {
+        // get game name and convert to lowercase
+        // split queryLower by spaces to get individual words
+        // check if game name contains at least one query word
+        // use Arrays.stream(queryWords).anyMatch(word -> gameName.contains(word))
+        // return false if rating is not null and < 2.0
+        // return false if ratingsCount is not null and < 5
+        // return true if all checks pass
+        return false;
+    }
+
+    private double calculateRelevanceScore(GameSearchResultDTO game, String queryLower) {
+        // get game name in lowercase
+        // start with score = 0.0
+        // add points for different match types:
+        // exact match (gameName.equals): +1000 points
+        // starts with query (gameName.startsWith): +500 points
+        // contains as whole word: +300 points
+        // contains anywhere: +100 points
+        // add bonus points
+        // rating bonus: rating * 10 (if not null)
+        // popularity bonus: Math.min(ratingsCount / 10.0, 50.0) (if not null)
+        // subtract points:
+        // DLC penalty: -100 if containsDlcKeywords() returns true
+        // return final score
+        return 0.0;
+    }
+
+    private boolean containsDlcKeywords(String gameName) {
+        String gameNameLower = gameName.toLowerCase();
+        String[] dlcKeywords = {
+                "dlc", "expansion", "season pass", "episode", "chapter",
+                "pack", "bundle", "collection", "edition", "remaster",
+                "definitive", "goty", "complete", "ultimate", "deluxe",
+                "enhanced", "director's cut", "special edition", "gold",
+                "premium", "collector's", "anniversary", "remastered"
+        };
+
+        return Arrays.stream(dlcKeywords)
+                .anyMatch(gameNameLower::contains);
     }
 }
