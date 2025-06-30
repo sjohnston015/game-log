@@ -1,3 +1,7 @@
+# ======================================
+# BACKEND (Spring Boot) IGNORES
+# ======================================
+
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -35,7 +39,7 @@ build/
 ### VS Code ###
 .vscode/
 
-# Spring Boot
+# Spring Boot Environment Files
 .env
 .env.local
 .env.development
@@ -46,3 +50,83 @@ build/
 *.db
 *.mv.db
 *.trace.db
+
+# ======================================
+# FRONTEND (React) IGNORES
+# ======================================
+
+# Dependencies
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
+
+# Testing
+frontend/coverage/
+
+# Production builds
+frontend/build/
+frontend/dist/
+
+# Environment variables
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# ======================================
+# GENERAL SYSTEM FILES
+# ======================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ======================================
+# DEVELOPMENT TOOLS
+# ======================================
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
