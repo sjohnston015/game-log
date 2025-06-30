@@ -2,6 +2,7 @@ package com.johnstondev.gamelog.service;
 
 import com.johnstondev.gamelog.dto.GameDetailDTO;
 import com.johnstondev.gamelog.dto.GameSearchResultDTO;
+import com.johnstondev.gamelog.dto.RawgSearchResponseDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -30,18 +31,31 @@ public class RawgService {
 
     // simple search - user types "zelda", gets games
     public List<GameSearchResultDTO> searchGames(String query) {
+
         // build URL with parameters
-        // - search: the query
-        // - page_size: 40
-        // - ordering: "-relevance,-rating,-added"
-        // - search_precise: true
-        // - search_exact: false
-        // Make API call with restTemplate.getForObject()
-        // if response is not null and has results
-        // call improveSearchResults(query, response.getResults())
-        // else return empty list
-        // wrap in try-catch and throw RuntimeException on error
-        return null;
+        String url = UriComponentsBuilder.fromUriString(baseUrl + "/games")
+                .queryParam("key", apiKey)
+                .queryParam("search", query)
+                .queryParam("page_size", 40)
+                .queryParam("ordering", "-relevance,-rating,-added")
+                .queryParam("search_precise", true)
+                .queryParam("search_exact", false)
+                .toUriString();
+
+        try {
+
+            // make API call with restTemplate.getForObject()
+            RawgSearchResponseDTO response = restTemplate.getForObject(url, RawgSearchResponseDTO.class);
+
+            if (response != null && response.getResults() != null) {
+                return improveSearchResults(query, response.getResults());
+            } else {
+                return List.of();
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to search: " + e.getMessage(), e);
+        }
     }
 
     // advanced search - with pagination
@@ -80,18 +94,19 @@ public class RawgService {
     }
 
     private List<GameSearchResultDTO> improveSearchResults(String query, List<GameSearchResultDTO> rawResults) {
-        // convert query to lowercase
-        // use stream() to:
-        // .filter() with isRelevantResult()
-        // .sorted() with calculateRelevanceScore()
-        // .limit(20)
-        // .collect(Collectors.toList())
-        return null;
+        String queryLower = query.toLowerCase().trim();
+
+        return rawResults.stream()
+                .filter(game -> isRelevantResult(game, queryLower))
+                .sorted((game1, game2) -> {
+                        double score1 = calculateRelevanceScore(game1, queryLower);
+                        double score2 = calculateRelevanceScore(game2, queryLower);
+                        return Double.compare(score1, score2);
+                })
+                .limit(20)
+                .toList();
     }
 
-    /**
-     * Filter out clearly irrelevant results
-     */
     private boolean isRelevantResult(GameSearchResultDTO game, String queryLower) {
         // get game name and convert to lowercase
         // split queryLower by spaces to get individual words
