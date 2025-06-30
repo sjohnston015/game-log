@@ -1,23 +1,21 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Homepage from './components/Homepage';
+
+
 
 function App() {
   return (
     <div className="App">
-      {/*
-        Adding routing later like this:
-
-        <Router>
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/search" element={<GameSearch />} />
-            <Route path="/library" element={<UserLibrary />} />
-          </Routes>
-        </Router>
-      */}
-
-      <Homepage />
+      <Router>
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/users/:username/game-log" element={<UserGameLog />} />
+          <Route path="/users/:username" element={<UserProfile />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
