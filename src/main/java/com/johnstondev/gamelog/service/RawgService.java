@@ -130,19 +130,47 @@ public class RawgService {
     }
 
     private double calculateRelevanceScore(GameSearchResultDTO game, String queryLower) {
-        // get game name in lowercase
-        // start with score = 0.0
-        // add points for different match types:
-        // exact match (gameName.equals): +1000 points
-        // starts with query (gameName.startsWith): +500 points
-        // contains as whole word: +300 points
-        // contains anywhere: +100 points
-        // add bonus points
-        // rating bonus: rating * 10 (if not null)
-        // popularity bonus: Math.min(ratingsCount / 10.0, 50.0) (if not null)
-        // subtract points:
-        // DLC penalty: -100 if containsDlcKeywords() returns true
-        // return final score
+
+        String gameName = game.getName().toLowerCase();
+        double score = 0.0;
+
+        // exact match gets highest score
+        if (gameName.equals(queryLower)) {
+            score += 1000.0;
+        }
+
+        // title starts with query gets high score
+        if (gameName.startsWith(queryLower)) {
+            score += 500.0;
+        }
+
+        // title contains query as whole word
+        if (gameName.contains(" " + queryLower + " ") ||
+                gameName.startsWith(queryLower + " ") ||
+                gameName.endsWith(" " + queryLower)) {
+            score += 300.0;
+        }
+
+        // partial match gets some points
+        if (gameName.contains(queryLower)) {
+            score += 100.0;
+        }
+
+        // bonus for higher ratings
+        if (game.getRating() != null) {
+            score += game.getRating() * 10;
+        }
+
+        // bonus for more rating counts (popular games)
+        if (game.getRatingsCount() != null) {
+            score += Math.min(game.getRatingsCount() / 10.0, 50.0);
+        }
+
+        // maybe penalty for DLC/expansion keywords idk
+        // if (containsDlcKeywords(gameName)) {
+            //score -= 100.0;
+        // }
+
         return 0.0;
     }
 
