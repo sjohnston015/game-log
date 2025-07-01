@@ -10,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class RawgService {
@@ -99,9 +100,24 @@ public class RawgService {
         return rawResults.stream()
                 .filter(game -> isRelevantResult(game, queryLower))
                 .sorted((game1, game2) -> {
-                        double score1 = calculateRelevanceScore(game1, queryLower);
-                        double score2 = calculateRelevanceScore(game2, queryLower);
-                        return Double.compare(score1, score2);
+                    // primary sort: Relevance score (higher first)
+                    double score1 = calculateRelevanceScore(game1, queryLower);
+                    double score2 = calculateRelevanceScore(game2, queryLower);
+                    int scoreComparison = Double.compare(score2, score1);
+
+                    // if scores are equal, sort by rating (higher first)
+                    if (scoreComparison == 0) {
+                        Double rating1 = game1.getRating();
+                        Double rating2 = game2.getRating();
+
+                        if (rating1 == null && rating2 == null) return 0;
+                        if (rating1 == null) return 1;
+                        if (rating2 == null) return -1;
+
+                        return Double.compare(rating2, rating1);
+                    }
+
+                    return scoreComparison;
                 })
                 .limit(20)
                 .toList();
@@ -160,44 +176,45 @@ public class RawgService {
         String gameName = game.getName().toLowerCase();
         double score = 0.0;
 
-        // exact match gets highest score
+        // EXACT MATCHING (Highest Priority)
         if (gameName.equals(queryLower)) {
-            score += 1000.0;
+            score += 1000.0; // Perfect match
         }
 
-        // title starts with query gets high score
+        // WORD BOUNDARY MATCHING (core relevance)
+        // check if query appears as complete word(s) - most important factor
+        String wordBoundaryPattern = ".*\\b" + Pattern.quote(queryLower) + "\\b.*";
+        if (gameName.matches(wordBoundaryPattern)) {
+            score += 500.0; // query appears as complete word
+        }
+        // fallback: substring match gets much lower score
+        else if (gameName.contains(queryLower)) {
+            score += 100.0; // basic substring match
+        }
+
+        // POSITION BONUS (where the match appears)
         if (gameName.startsWith(queryLower)) {
-            score += 500.0;
+            score += 200.0; // bonus if query is at the very start
+        }
+        else if (gameName.startsWith("the " + queryLower) ||
+                gameName.startsWith("super " + queryLower) ||
+                gameName.startsWith("new " + queryLower)) {
+            score += 150.0; // bonus for common title patterns
         }
 
-        // title contains query as whole word
-        if (gameName.contains(" " + queryLower + " ") ||
-                gameName.startsWith(queryLower + " ") ||
-                gameName.endsWith(" " + queryLower)) {
-            score += 300.0;
-        }
-
-        // partial match gets some points
-        if (gameName.contains(queryLower)) {
-            score += 100.0;
-        }
-
-        // bonus for higher ratings
+        // QUALITY INDICATORS (Rating & Popularity)
+        // rating bonus - but capped so it doesn't overwhelm relevance
         if (game.getRating() != null) {
-            score += game.getRating() * 10;
+            score += game.getRating() * 30; // max ~150 points for perfect rating
         }
 
-        // bonus for more rating counts (popular games)
+        // popularity bonus - logarithmic scale
         if (game.getRatingsCount() != null) {
-            score += Math.min(game.getRatingsCount() / 10.0, 50.0);
+            double popularityScore = Math.min(Math.log10(Math.max(game.getRatingsCount(), 1)) * 25, 100);
+            score += popularityScore;
         }
 
-        // maybe penalty for DLC/expansion keywords idk
-        // if (containsDlcKeywords(gameName)) {
-            //score -= 100.0;
-        // }
-
-        return 0.0;
+        return score; // never go below 0
     }
 
     private boolean containsDlcKeywords(String gameName) {
